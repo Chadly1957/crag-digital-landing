@@ -120,7 +120,7 @@ export default function MapPicker({ onPin }: MapPickerProps) {
       <div className="relative">
         <div className="flex gap-2">
           <input
-            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+            className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             placeholder="Search address or city (e.g. Decatur, IL)..."
             value={search}
             onChange={e => { setSearch(e.target.value); setSuggestions([]); }}
@@ -129,7 +129,7 @@ export default function MapPicker({ onPin }: MapPickerProps) {
           <button
             onClick={doSearch}
             disabled={searching || !search.trim()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 rounded-lg text-white text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 rounded-lg text-white text-sm font-medium transition-colors"
           >
             {searching ? "..." : "Search"}
           </button>
@@ -137,11 +137,11 @@ export default function MapPicker({ onPin }: MapPickerProps) {
 
         {/* Suggestions dropdown */}
         {suggestions.length > 0 && (
-          <ul className="absolute z-50 left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg overflow-hidden shadow-xl">
+          <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg">
             {suggestions.map((s, i) => (
               <li key={i}>
                 <button
-                  className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-700 transition-colors"
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => selectSuggestion(s)}
                 >
                   {s.display_name}
@@ -152,12 +152,12 @@ export default function MapPicker({ onPin }: MapPickerProps) {
         )}
 
         {searchError && (
-          <p className="text-xs text-red-400 mt-1">{searchError}</p>
+          <p className="text-xs text-red-500 mt-1">{searchError}</p>
         )}
       </div>
 
       {/* Map */}
-      <div className="rounded-xl overflow-hidden border border-slate-600" style={{ height: 280 }}>
+      <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: 280 }}>
         <MapContainer
           center={[39.5, -98.35]}
           zoom={4}
@@ -175,18 +175,18 @@ export default function MapPicker({ onPin }: MapPickerProps) {
 
       {/* Coordinates display */}
       {pin ? (
-        <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-          <span className="text-green-400 text-lg">📍</span>
+        <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <span className="text-green-600 text-lg">📍</span>
           <div>
-            <p className="text-sm font-semibold text-green-300">Pin dropped</p>
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-sm font-semibold text-green-700">Pin dropped</p>
+            <p className="text-xs text-gray-500 font-mono">
               {Math.abs(pin[0]).toFixed(6)}° {pin[0] >= 0 ? "N" : "S"},&nbsp;
               {Math.abs(pin[1]).toFixed(6)}° {pin[1] >= 0 ? "E" : "W"}
             </p>
           </div>
         </div>
       ) : (
-        <p className="text-xs text-slate-500 text-center">
+        <p className="text-xs text-gray-400 text-center">
           Search for a location or click the map to drop a pin
         </p>
       )}

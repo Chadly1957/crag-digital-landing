@@ -7,9 +7,9 @@ interface ScoreGaugeProps {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 80) return "#22c55e";
-  if (score >= 50) return "#f59e0b";
-  return "#ef4444";
+  if (score >= 80) return "#16a34a";
+  if (score >= 50) return "#d97706";
+  return "#dc2626";
 }
 
 function scoreLabel(score: number): string {
@@ -24,7 +24,6 @@ export function ScoreGauge({ score, label, size = "md" }: ScoreGaugeProps) {
   const cx = r + 8;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (score / 100) * circumference;
-
   const svgSize = (r + 8) * 2;
   const strokeWidth = size === "lg" ? 8 : size === "sm" ? 5 : 6;
 
@@ -37,7 +36,7 @@ export function ScoreGauge({ score, label, size = "md" }: ScoreGaugeProps) {
             cy={cx}
             r={r}
             fill="none"
-            stroke="#1e293b"
+            stroke="#e5e7eb"
             strokeWidth={strokeWidth}
           />
           <circle
@@ -62,10 +61,10 @@ export function ScoreGauge({ score, label, size = "md" }: ScoreGaugeProps) {
           </span>
         </div>
       </div>
-      <p className={`font-medium text-slate-300 text-center ${size === "sm" ? "text-xs" : "text-sm"}`}>{label}</p>
+      <p className={`font-medium text-gray-600 text-center ${size === "sm" ? "text-xs" : "text-sm"}`}>{label}</p>
       <span
         className={`text-xs font-semibold px-2 py-0.5 rounded-full ${size !== "sm" ? "block" : "hidden"}`}
-        style={{ backgroundColor: color + "22", color }}
+        style={{ backgroundColor: color + "18", color }}
       >
         {scoreLabel(score)}
       </span>

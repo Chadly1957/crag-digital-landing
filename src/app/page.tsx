@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { ScoreBar } from "@/components/ScoreBar";
 import { CheckItem } from "@/components/CheckItem";
@@ -12,13 +11,10 @@ type Tab = "overview" | "onpage" | "technical" | "local" | "serp";
 
 export default function Home() {
   const [url, setUrl] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [psiApiKey, setPsiApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
-  const [showSettings, setShowSettings] = useState(false);
 
   async function analyze() {
     if (!url.trim()) return;
@@ -31,7 +27,7 @@ export default function Home() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, keyword: keyword || undefined, psiApiKey: psiApiKey || undefined }),
+        body: JSON.stringify({ url }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Analysis failed");
@@ -52,120 +48,56 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-800 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm">S</div>
-            <div>
-              <h1 className="text-lg font-bold text-white leading-none">SEO Rank Analyzer</h1>
-              <p className="text-xs text-slate-400 mt-0.5">On-page · Technical · Local SEO · SERP Rankings</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/image-seo"
-              className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800"
-            >
-              Image SEO →
-            </Link>
+    <div className="min-h-screen bg-white text-gray-900">
+      <main className="max-w-4xl mx-auto px-5 py-6 space-y-5">
+
+        {/* URL Input */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+          <label className="text-sm font-semibold text-gray-700 mb-2 block">Website URL</label>
+          <div className="flex gap-3">
+            <input
+              type="url"
+              className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm"
+              placeholder="https://yourbusiness.com"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && analyze()}
+            />
             <button
-              onClick={() => setShowSettings(s => !s)}
-              className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800"
+              onClick={analyze}
+              disabled={loading || !url.trim()}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-white font-bold text-sm transition-colors"
             >
-              {showSettings ? "Hide Settings" : "Settings"}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
+                  Analyzing...
+                </span>
+              ) : "Analyze"}
             </button>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-        {/* URL Input */}
-        <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-4">
-          <div>
-            <label className="text-sm font-semibold text-slate-200 mb-1.5 block">Website URL</label>
-            <div className="flex gap-3">
-              <input
-                type="url"
-                className="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm"
-                placeholder="https://yourbusiness.com"
-                value={url}
-                onChange={e => setUrl(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && analyze()}
-              />
-              <button
-                onClick={analyze}
-                disabled={loading || !url.trim()}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-white font-bold text-sm transition-all"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
-                    Analyzing...
-                  </span>
-                ) : "Analyze"}
-              </button>
-            </div>
-          </div>
-
-          {/* Optional settings */}
-          {showSettings && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-slate-400 mb-1 block">Target Keyword (optional)</label>
-                <input
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                  placeholder="e.g. plumber Austin TX"
-                  value={keyword}
-                  onChange={e => setKeyword(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-slate-400 mb-1 block">
-                  PageSpeed Insights API Key{" "}
-                  <span className="text-slate-500">(optional)</span>
-                </label>
-                <input
-                  type="password"
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                  placeholder="Google API key"
-                  value={psiApiKey}
-                  onChange={e => setPsiApiKey(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {!showSettings && (
-            <p className="text-xs text-slate-500">
-              Add a target keyword and API keys in{" "}
-              <button className="text-blue-400 hover:underline" onClick={() => setShowSettings(true)}>Settings</button>{" "}
-              for deeper analysis
-            </p>
-          )}
         </div>
 
         {/* Error */}
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
             <strong>Error:</strong> {error}
           </div>
         )}
 
         {/* Loading */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-16 space-y-4">
-            <div className="w-12 h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin" />
-            <p className="text-slate-400 text-sm">Crawling and analyzing your site...</p>
+          <div className="flex flex-col items-center justify-center py-14 space-y-3">
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+            <p className="text-gray-400 text-sm">Crawling and analyzing your site...</p>
           </div>
         )}
 
         {/* Results */}
         {result && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Score hero */}
-            <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row items-center gap-8">
                 <ScoreGauge score={result.overallScore} label="Overall Score" size="lg" />
                 <div className="flex gap-8 flex-wrap justify-center">
@@ -177,12 +109,12 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-slate-700 flex items-center gap-3 flex-wrap">
-                <div className="text-xs text-slate-400 truncate">{result.url}</div>
-                <div className="text-xs text-slate-500 shrink-0">·</div>
-                <div className="text-xs text-slate-400 shrink-0">{result.onPage.wordCount.toLocaleString()} words</div>
-                <div className="text-xs text-slate-500 shrink-0">·</div>
-                <div className="text-xs text-slate-400 shrink-0">{result.onPage.images.total} images</div>
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3 flex-wrap">
+                <div className="text-xs text-gray-400 truncate">{result.url}</div>
+                <div className="text-xs text-gray-300 shrink-0">·</div>
+                <div className="text-xs text-gray-400 shrink-0">{result.onPage.wordCount.toLocaleString()} words</div>
+                <div className="text-xs text-gray-300 shrink-0">·</div>
+                <div className="text-xs text-gray-400 shrink-0">{result.onPage.images.total} images</div>
               </div>
             </div>
 
@@ -190,12 +122,12 @@ export default function Home() {
             {(result.topIssues.length > 0 || result.quickWins.length > 0) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {result.topIssues.length > 0 && (
-                  <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
-                    <h3 className="text-sm font-bold text-red-400 mb-3">Top Issues to Fix</h3>
+                  <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
+                    <h3 className="text-sm font-bold text-red-600 mb-3">Top Issues to Fix</h3>
                     <ul className="space-y-2">
                       {result.topIssues.map((issue, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                          <span className="text-red-400 shrink-0 font-bold">{i + 1}.</span>
+                        <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                          <span className="text-red-500 shrink-0 font-bold">{i + 1}.</span>
                           {issue}
                         </li>
                       ))}
@@ -203,12 +135,12 @@ export default function Home() {
                   </div>
                 )}
                 {result.quickWins.length > 0 && (
-                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5">
-                    <h3 className="text-sm font-bold text-amber-400 mb-3">Quick Wins</h3>
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
+                    <h3 className="text-sm font-bold text-amber-600 mb-3">Quick Wins</h3>
                     <ul className="space-y-2">
                       {result.quickWins.map((win, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                          <span className="text-amber-400 shrink-0">→</span>
+                        <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                          <span className="text-amber-500 shrink-0">→</span>
                           {win}
                         </li>
                       ))}
@@ -220,15 +152,15 @@ export default function Home() {
 
             {/* Tabs */}
             <div>
-              <div className="flex gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700 overflow-x-auto">
+              <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
                 {tabs.map(t => (
                   <button
                     key={t.id}
                     onClick={() => setTab(t.id)}
                     className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                       tab === t.id
-                        ? "bg-blue-600 text-white"
-                        : "text-slate-400 hover:text-white hover:bg-slate-700"
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "text-gray-600 hover:bg-gray-200"
                     }`}
                   >
                     {t.label}
@@ -236,7 +168,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-4 bg-slate-800/60 border border-slate-700 rounded-2xl p-6">
+              <div className="mt-3 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
                 {tab === "overview" && <OverviewTab result={result} />}
                 {tab === "onpage" && <OnPageTab result={result} />}
                 {tab === "technical" && <TechnicalTab result={result} />}
@@ -249,10 +181,10 @@ export default function Home() {
 
         {/* Empty state */}
         {!result && !loading && !error && (
-          <div className="text-center py-16 text-slate-500">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="text-lg font-semibold text-slate-400">Enter a URL to get started</p>
-            <p className="text-sm mt-1">Get a full SEO score, on-page audit, local SEO analysis, and real SERP rankings</p>
+          <div className="text-center py-12 text-gray-400">
+            <div className="text-4xl mb-3">🔍</div>
+            <p className="font-semibold text-gray-500">Enter a URL to get started</p>
+            <p className="text-sm mt-1">On-page audit · Technical SEO · Local SEO · SERP rankings</p>
           </div>
         )}
       </main>
@@ -262,10 +194,10 @@ export default function Home() {
 
 function OverviewTab({ result }: { result: AnalysisResult }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {result.pagespeed && (
         <div>
-          <h3 className="text-sm font-semibold text-slate-300 mb-3">Core Web Vitals (Mobile)</h3>
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">Core Web Vitals (Mobile)</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: "FCP", value: result.pagespeed.fcp, desc: "First Contentful Paint" },
@@ -273,10 +205,10 @@ function OverviewTab({ result }: { result: AnalysisResult }) {
               { label: "CLS", value: result.pagespeed.cls, desc: "Cumulative Layout Shift" },
               { label: "TBT", value: result.pagespeed.tbt, desc: "Total Blocking Time" },
             ].map(m => (
-              <div key={m.label} className="bg-slate-700/50 rounded-xl p-3 text-center">
-                <p className="text-lg font-bold text-white">{m.value}</p>
-                <p className="text-xs font-semibold text-slate-300">{m.label}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{m.desc}</p>
+              <div key={m.label} className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+                <p className="text-lg font-bold text-gray-900">{m.value}</p>
+                <p className="text-xs font-semibold text-gray-600">{m.label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{m.desc}</p>
               </div>
             ))}
           </div>
@@ -284,7 +216,7 @@ function OverviewTab({ result }: { result: AnalysisResult }) {
       )}
 
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-slate-300">Section Scores</h3>
+        <h3 className="text-sm font-semibold text-gray-600">Section Scores</h3>
         <ScoreBar label="On-Page SEO" score={result.onPageScore} />
         <ScoreBar label="Technical SEO" score={result.technicalScore} />
         <ScoreBar label="Local SEO" score={result.localScore} />
@@ -304,9 +236,9 @@ function OverviewTab({ result }: { result: AnalysisResult }) {
           { label: "Internal Links", value: String(result.onPage.links.internal) },
           { label: "Schema Types", value: String(result.onPage.schema.types.length) },
         ].map(s => (
-          <div key={s.label} className="bg-slate-700/50 rounded-xl p-3 text-center">
-            <p className="text-xl font-bold text-white">{s.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{s.label}</p>
+          <div key={s.label} className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+            <p className="text-xl font-bold text-gray-900">{s.value}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -317,7 +249,7 @@ function OverviewTab({ result }: { result: AnalysisResult }) {
 function OnPageTab({ result }: { result: AnalysisResult }) {
   const { onPage } = result;
   return (
-    <div className="space-y-1">
+    <div className="space-y-0">
       <CheckItem
         label="Title Tag"
         passed={!!onPage.title.value && onPage.title.score >= 60}
@@ -386,7 +318,7 @@ function OnPageTab({ result }: { result: AnalysisResult }) {
 function TechnicalTab({ result }: { result: AnalysisResult }) {
   const { technical, pagespeed } = result;
   return (
-    <div className="space-y-1">
+    <div className="space-y-0">
       <CheckItem
         label="HTTPS / SSL"
         passed={technical.https.enabled}
@@ -427,19 +359,13 @@ function TechnicalTab({ result }: { result: AnalysisResult }) {
       {pagespeed && (
         <>
           <div className="pt-4 pb-1">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">PageSpeed Insights</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">PageSpeed Insights</p>
           </div>
           <CheckItem label="Performance" passed={pagespeed.performance >= 50} detail={`Score: ${pagespeed.performance}/100`} score={pagespeed.performance} />
           <CheckItem label="Accessibility" passed={pagespeed.accessibility >= 80} detail={`Score: ${pagespeed.accessibility}/100`} score={pagespeed.accessibility} />
           <CheckItem label="Best Practices" passed={pagespeed.bestPractices >= 80} detail={`Score: ${pagespeed.bestPractices}/100`} score={pagespeed.bestPractices} />
           <CheckItem label="PSI SEO Score" passed={pagespeed.seo >= 80} detail={`Score: ${pagespeed.seo}/100`} score={pagespeed.seo} />
         </>
-      )}
-
-      {!pagespeed && (
-        <div className="mt-4 p-3 rounded-lg bg-slate-700/50 text-sm text-slate-400">
-          Add a Google PageSpeed Insights API key in Settings for deeper technical analysis including Core Web Vitals.
-        </div>
       )}
     </div>
   );
@@ -449,7 +375,7 @@ function LocalTab({ result }: { result: AnalysisResult }) {
   const { local } = result;
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
+      <div className="space-y-0">
         <CheckItem
           label="Phone Number on Page"
           passed={local.napPresent.phone}
@@ -488,9 +414,9 @@ function LocalTab({ result }: { result: AnalysisResult }) {
         />
       </div>
 
-      <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-        <h4 className="text-sm font-semibold text-blue-300 mb-3">Local SEO Action Checklist</h4>
-        <ul className="space-y-1.5 text-sm text-slate-300">
+      <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+        <h4 className="text-sm font-semibold text-blue-700 mb-3">Local SEO Action Checklist</h4>
+        <ul className="space-y-1.5 text-sm text-gray-700">
           {[
             { done: local.localSchema.present, text: "Add LocalBusiness JSON-LD schema to every page" },
             { done: local.napPresent.phone && local.napPresent.address, text: "Ensure NAP (Name, Address, Phone) is consistent across site" },
@@ -499,10 +425,8 @@ function LocalTab({ result }: { result: AnalysisResult }) {
             { done: false, text: "Build local citations on Yelp, YellowPages, BBB" },
             { done: false, text: "Earn reviews on Google Business Profile" },
           ].map(({ done, text }, i) => (
-            <li key={i} className={`flex items-start gap-2 ${done ? "line-through text-slate-500" : ""}`}>
-              <span className={done ? "text-green-500" : "text-slate-500"}>
-                {done ? "✓" : "○"}
-              </span>
+            <li key={i} className={`flex items-start gap-2 ${done ? "line-through text-gray-400" : ""}`}>
+              <span className={done ? "text-green-500" : "text-gray-400"}>{done ? "✓" : "○"}</span>
               {text}
             </li>
           ))}
