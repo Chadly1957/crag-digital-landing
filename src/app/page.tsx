@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { ScoreBar } from "@/components/ScoreBar";
 import { CheckItem } from "@/components/CheckItem";
@@ -62,12 +63,20 @@ export default function Home() {
               <p className="text-xs text-slate-400 mt-0.5">On-page · Technical · Local SEO · SERP Rankings</p>
             </div>
           </div>
-          <button
-            onClick={() => setShowSettings(s => !s)}
-            className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800"
-          >
-            {showSettings ? "Hide Settings" : "Settings"}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/image-seo"
+              className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800"
+            >
+              Image SEO →
+            </Link>
+            <button
+              onClick={() => setShowSettings(s => !s)}
+              className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800"
+            >
+              {showSettings ? "Hide Settings" : "Settings"}
+            </button>
+          </div>
         </div>
       </header>
 
